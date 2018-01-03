@@ -1,0 +1,9 @@
+#!/Library/Frameworks/Python.framework/Versions/2.7/Resources/Python.app/Contents/MacOS/Python
+# -*- coding: utf-8 -*-
+
+from sebflow.bin.cli import CLIFactory
+
+if __name__ == '__main__':
+    parser = CLIFactory.get_parser()
+    args = parser.parse_args()
+    args.func(args)
