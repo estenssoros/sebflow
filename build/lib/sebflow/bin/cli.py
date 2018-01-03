@@ -4,7 +4,7 @@
 import argparse
 from collections import namedtuple
 from sebflow import settings
-from utils import db as db_utils
+from sebflow.utils import db as db_utils
 
 Arg = namedtuple('Arg', ['flags', 'help', 'action', 'default', 'nargs', 'type', 'choices', 'metavar'])
 Arg.__new__.__defaults__ = (None, None, None, None, None, None, None)
