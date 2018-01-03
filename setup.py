@@ -1,4 +1,11 @@
+import os
+import shutil
+
 from setuptools import find_packages, setup
+
+for f in ('build', 'dist', 'sebflow.egg-info'):
+    if os.path.exists(f):
+        shutil.rmtree(f)
 
 
 def do_setup():
@@ -14,7 +21,7 @@ def do_setup():
         ],
         author='Sebastian Estenssoro',
         author_email='seb.estenssoro@gmail.com',
-        url = 'http://estenssoros.com',
+        url='http://estenssoros.com',
         scripts=['sebflow/bin/sebflow'],
     )
 
