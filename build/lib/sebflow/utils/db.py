@@ -1,9 +1,9 @@
-import db_settings
+from sebflow import settings
 import MySQLdb
 
 
 def init_db():
-    conn = MySQLdb.connect(**db_settings.DB_CREDS)
+    conn = MySQLdb.connect(**settings.DB_CREDS)
     curs = conn.cursor()
 
     curs.execute('DROP TABLE IF EXISTS dags;')
