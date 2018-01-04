@@ -7,7 +7,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 # TIMEZONE='America/Denver'
 TIMEZONE = pendulum.local_timezone()
-
+PARALLELISM = 32
 HEADER = '''
    _____ __________  ________    ____ _       __
   / ___// ____/ __ )/ ____/ /   / __ \ |     / /

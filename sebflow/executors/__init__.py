@@ -1,9 +1,9 @@
-from sebflow import configuration
+# from sebflow import configuration
 from sebflow.exceptions import SebFlowException
 from sebflow.executors.local_executor import LocalExecutor
 from sebflow.executors.sequential_executor import SequentialExecutor
 
-DEFAULT_EXECUTOR = None
+DEFAULT_EXECUTOR = SequentialExecutor()
 
 
 def GetDefaultExecutor():

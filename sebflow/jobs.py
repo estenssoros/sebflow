@@ -2,7 +2,7 @@ import datetime as dt
 import getpass
 import socket
 
-from sebflow import models
+from sebflow import executors, models
 from sebflow.utils import timezone
 from sebflow.utils.db import create_session, provide_session
 from sebflow.utils.state import State
@@ -20,12 +20,18 @@ class BaseJob(Base):
     state = Column(String(20))
     start_date = Column(UtcDateTime())
     end_date = Column(UtcDateTime())
+    executor_class = Column(String(100))
     hostname = Column(String(100))
     unixname = Column(String(100))
 
-    def __init__(self, *args, **kwargs):
-        self.start_date = timezone.utcnow()
+    def __init__(self,
+                 executor=executors.GetDefaultExecutor(),
+                 *args, **kwargs):
+
         self.hostname = socket.getfqdn()
+        self.executor = executor
+        self.executor_class = executor.__class__.__name__
+        self.start_date = timezone.utcnow()
         self.unixname = getpass.getuser()
         super(BaseJob, self).__init__(*args, **kwargs)
 
@@ -78,7 +84,33 @@ class BaseJob(Base):
         raise NotImplementedError("this method need to be overridden")
 
 
-class SchedulerJob(BaseJob):
+class SebJob(BaseJob):
+    class _DagRunTaskStatus(object):
+        def __init__(self,
+                     to_run=None,
+                     started=None,
+                     skipped=None,
+                     succeeded=None,
+                     failed=None,
+                     not_ready=None,
+                     deadlocked=None,
+                     active_runs=None,
+                     executed_dag_run_dates=None,
+                     finished_runs=0,
+                     total_runs=0
+                     ):
+            self.to_run = to_run or dict()
+            self.started = started or dict()
+            self.skipped = skipped or set()
+            self.succeeded = succeeded or set()
+            self.failed = failed or set()
+            self.not_ready = not_ready or set()
+            self.deadlocked = deadlocked or set()
+            self.active_runs = active_runs or set()
+            self.executed_dag_run_dates = executed_dag_run_dates or set()
+            self.finished_runs = finished_runs or set()
+            self.total_runs = total_runs or set()
+
     def __init__(self, dag, start_date, end_date, mark_success, *args, **kwargs):
         self.dag = dag
         self.dag_id = dag.dag_id
@@ -87,21 +119,9 @@ class SchedulerJob(BaseJob):
         self.mark_success = mark_success
         super(SebJob, self).__init__(*args, **kwargs)
 
-    class _DagRunTaskStatus(object):
-        def __init__(self,
-            to_run=None,
-            started=None,
-            skipped=None,
-            succeeded=None,
-            failed=None,
-            not_ready=None,
-            deadlocked=None,
-            active_runs=None,
-            executed_dag_run_dates=None,
-            finished_runs=0,
-            total_runs=0
-        ):
-
-
     @provide_session
     def _execute(self, session=None):
+        ti_status = SebJob._DagRunTaskStatus()
+        start_date = self.start_date
+        executor = self.executor
+        executor.start()

@@ -25,9 +25,9 @@ def provide_session(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         arg_session = 'session'
-        fun_params = func.__code__.co_varnames
+        func_params = func.__code__.co_varnames
         session_in_args = arg_session in func_params and func_params.index(arg_session) < len(args)
-        session_in_kwargs = args_session in kwargs
+        session_in_kwargs = arg_session in kwargs
 
         if session_in_args or session_in_kwargs:
             return func(*args, **kwargs)
@@ -87,6 +87,7 @@ def init_db():
         , state VARCHAR(20)
         , start_date TIMESTAMP WITH TIME ZONE
         , end_date TIMESTAMP WITH TIME ZONE
+        , executor_class VARCHAR(100)
         , hostname VARCHAR(100)
         , unixname VARCHAR(100)
     )
