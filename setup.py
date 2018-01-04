@@ -23,6 +23,9 @@ def do_setup():
         author_email='seb.estenssoro@gmail.com',
         url='http://estenssoros.com',
         scripts=['sebflow/bin/sebflow'],
+        entry_points={'console_scripts':
+                      ['sebflow = sebflow.bin.sebflow:entrypoint']
+                      },
     )
 
 
