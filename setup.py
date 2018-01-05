@@ -14,6 +14,7 @@ def do_setup():
         description='programatically author, schedule, and monitor data pipelines',
         license='MIT',
         packages=find_packages(),
+        include_package_date =True,
         install_requires=[
             'psycopg2==2.7.3.2',
             'django==1.11',

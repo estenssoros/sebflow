@@ -3,7 +3,7 @@ from functools import wraps
 
 import funcsigs
 
-from sebflow.exceptions import SebFlowException
+from sebflow.exceptions import SebflowException
 
 signature = funcsigs.signature
 

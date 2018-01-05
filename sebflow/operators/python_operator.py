@@ -1,4 +1,4 @@
-from sebflow.exceptions import SebFlowException
+from sebflow.exceptions import SebflowException
 from sebflow.models import DAG, BaseOperator
 from sebflow.utils.decorators import apply_defaults
 
@@ -14,7 +14,7 @@ class PythonOperator(BaseOperator):
              *args, **kwargs):
         super(PythonOperator, self).__init__(*args, **kwargs)
         if not callable(python_callable):
-            raise SebFlowException('`python_callable` must be callable')
+            raise SebflowException('`python_callable` must be callable')
         self.python_callable = python_callable
         self.op_args = op_args or []
         self.op_kwargs = op_kwargs or {}

@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 
@@ -5,9 +6,34 @@ import pendulum
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
+from sebflow import configuration as conf
+
+log = logging.getLogger(__name__)
 # TIMEZONE='America/Denver'
 TIMEZONE = pendulum.local_timezone()
 PARALLELISM = 32
+
+
+class DummyStatsLogger(object):
+    @classmethod
+    def incr(cls, stat, count=1, rate=1):
+        pass
+
+    @classmethod
+    def decr(cls, stat, count=1, rate=1):
+        pass
+
+    @classmethod
+    def gauge(cls, stat, value, rate=1, delta=False):
+        pass
+
+    @classmethod
+    def timing(cls, stat, dt):
+        pass
+
+
+Stats = DummyStatsLogger
+
 HEADER = '''
    _____ __________  ________    ____ _       __
   / ___// ____/ __ )/ ____/ /   / __ \ |     / /
@@ -78,4 +104,3 @@ def dispose_orm():
 
 configure_vars()
 configure_orm()
-print(HEADER)

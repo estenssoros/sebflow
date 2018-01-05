@@ -1,3 +1,5 @@
 # -*- coding: utf-8 -*-
-class SebFlowException(Exception):
+class SebflowException(Exception):
+    pass
+class SebflowConfigException(Exception):
     pass

@@ -85,8 +85,10 @@ def init_db():
         id SERIAL
         , dag_id VARCHAR(250)
         , state VARCHAR(20)
+        , job_type VARCHAR(30)
         , start_date TIMESTAMP WITH TIME ZONE
         , end_date TIMESTAMP WITH TIME ZONE
+        , latest_heartbeat TIMESTAMP WITH TIME ZONE
         , executor_class VARCHAR(100)
         , hostname VARCHAR(100)
         , unixname VARCHAR(100)

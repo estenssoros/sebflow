@@ -1,5 +1,5 @@
 # from sebflow import configuration
-from sebflow.exceptions import SebFlowException
+from sebflow.exceptions import SebflowException
 from sebflow.executors.local_executor import LocalExecutor
 from sebflow.executors.sequential_executor import SequentialExecutor
 
@@ -22,4 +22,4 @@ def _get_executor(executor_name):
     elif executor_name == 'SequentialExecutor':
         return SequentialExecutor()
     else:
-        raise SebFlowException
+        raise SebflowException

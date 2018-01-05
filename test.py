@@ -1,4 +1,5 @@
 import datetime as dt
+import six
 
 from sebflow import DAG
 from sebflow.operators.python_operator import PythonOperator
@@ -6,19 +7,19 @@ from sebflow.operators.python_operator import PythonOperator
 
 def print_date():
     now = dt.datetime.now()
-    print now.strftime('%Y/%m/%d %H:%M')
+    print(now.strftime('%Y/%m/%d %H:%M'))
 
 
 def print_args(arg1, arg2):
-    print arg1
-    print arg2
+    print(arg1)
+    print(arg2)
 
 
 def print_kwargs(arg1, arg2, kwarg1=None, kwarg2=None):
-    print arg1
-    print arg2
-    print kwarg1
-    print kwarg2
+    print(arg1)
+    print(arg2)
+    print(kwarg1)
+    print(kwarg2)
 
 
 default_args = {
@@ -55,4 +56,4 @@ t3 = PythonOperator(
 t2.set_upstream(t1)
 t3.set_upstream(t1)
 
-dag.run_now()
+dag.run()
