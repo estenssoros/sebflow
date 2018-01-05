@@ -2,12 +2,13 @@ import datetime as dt
 import getpass
 import socket
 
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm.session import make_transient
+
 from sebflow import executors, models
 from sebflow.utils import timezone
 from sebflow.utils.db import create_session, provide_session
 from sebflow.utils.state import State
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm.session import make_transient
 from sqlalchemy_utc import UtcDateTime
 
 Base = models.Base
@@ -120,8 +121,54 @@ class SebJob(BaseJob):
         super(SebJob, self).__init__(*args, **kwargs)
 
     @provide_session
+    def _get_dag_run(self, start_date, session=None):
+
+    @provide_session
+    def _execute_for_date(self, executor, start_date, session=None):
+        dag_run = self._get_dag_run(start_date, session=session)
+        tis_map = self._task_instances_for_dag_run(dag_run, session=session)
+
+    @provide_session
     def _execute(self, session=None):
         ti_status = SebJob._DagRunTaskStatus()
         start_date = self.start_date
         executor = self.executor
         executor.start()
+        try:
+            self._execute_for_date(executor=executor,
+                                   start_date=start_date,
+                                   session=session)
+        finally:
+            executor.end()
+            session.commit()
+        print('job complete!')
+
+
+class SchedulerJob(BaseJob):
+    __mapper_args__ = {'polymorphic_identity': 'SchedulerJob'}
+
+    def __init__(
+            self,
+            dag_id=None,
+            dag_ids=None,
+            subdir=settings.DAGS_FOLDER,
+            num_runs=-1,
+            file_process_interval=0,
+            processor_poll_interval=1.0, run_duration=None,
+            *args,
+            **kwargs):
+
+        self.dag_id = dag_id
+        self.dag_ids = [dag_id] if dag_id else []
+        if dag_ids:
+            self.dag_ids.extend(dag_ids)
+        self.subdir = subdir
+        self.num_runs = num_runs
+        self.run_duration = run_duration
+        self._processor_poll_interval = processor_poll_interval
+        super(SchedulerJob, self).__init__(*args, **kwargs)
+        self.heartrate = 5
+        self.max_threads = 2
+        self.dag_dir_list_interval = 300
+        self.print_stats_interval = 30
+        self.file_process_interval=file_process_interval

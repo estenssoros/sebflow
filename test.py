@@ -55,4 +55,4 @@ t3 = PythonOperator(
 t2.set_upstream(t1)
 t3.set_upstream(t1)
 
-dag.run()
+dag.run_now()

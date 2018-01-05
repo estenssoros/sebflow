@@ -17,7 +17,8 @@ def do_setup():
         install_requires=[
             'psycopg2==2.7.3.2',
             'django==1.11',
-            'tabulate== 0.7.7'
+            'tabulate==0.7.7',
+            'sqlalchemy-utc==0.9.0'
         ],
         author='Sebastian Estenssoro',
         author_email='seb.estenssoro@gmail.com',

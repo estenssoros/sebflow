@@ -5,10 +5,12 @@ import sys
 import time
 import warnings
 
+from sqlalchemy.ext.declarative import declarative_base
+
 from sebflow import settings
+from sebflow.utils import timezone
 from sebflow.utils.dates import cron_presets
 from sebflow.utils.decorators import apply_defaults
-from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
@@ -161,6 +163,9 @@ class DAG(object):
         self.task_dict = dict()
         # self.executor = LocalExecutor()
 
+    def __repr__(self):
+        return "<DAG: {self._dag_id}>".format(self=self)
+
     @property
     def dag_id(self):
         return self._dag_id
@@ -185,6 +190,14 @@ class DAG(object):
     def task_ids(self):
         return list(self.task_dict.keys())
 
+    def has_task(self, task_id):
+        return task_id in (t.task_id for t in self.tasks)
+
+    def get_task(self, task_id):
+        if task_id in self.task_dict:
+            return self.task_dict[task_id]
+        raise SebFlowException('Task {task_id} not found'.format(**locals()))
+
     def add_task(self, task):
         if task.task_id in self.task_dict:
             raise SebFlowException('task {} already exists in dag'.format(str(task)))
@@ -198,31 +211,23 @@ class DAG(object):
         for task in tasks:
             self.add_task(task)
 
-    def run(
+    def run(  # 3732
             self,
-            start_date=None,
+            start_date=timezone.utcnow(),
             end_date=None,
-            mark_success=False):
-        if start_date is None:
-            start_date= dt.datetime.now()
+            mark_success=False,
+            local=False,
+            executor=None,
+            pool=None):
         from sebflow.jobs import SebJob
         job = SebJob(
             self,
             start_date=start_date,
             end_date=end_date,
-            mark_success=mark_success)
+            mark_success=mark_success,
+            executor=LocalExecutor(),
+            pool=pool)
         job.run()
-
-    def __repr__(self):
-        return "<DAG: {self._dag_id}>".format(self=self)
-
-    def has_task(self, task_id):
-        return task_id in (t.task_id for t in self.tasks)
-
-    def get_task(self, task_id):
-        if task_id in self.task_dict:
-            return self.task_dict[task_id]
-        raise SebFlowException('Task {task_id} not found'.format(**locals()))
 
 
 class DagBag(object):

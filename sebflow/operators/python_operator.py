@@ -6,7 +6,12 @@ from sebflow.utils.decorators import apply_defaults
 
 class PythonOperator(BaseOperator):
     @apply_defaults
-    def __init__(self, python_callable, op_args=None, op_kwargs=None, *args, **kwargs):
+    def __init__(
+            self,
+            python_callable,
+            op_args=None,
+            op_kwargs=None,
+             *args, **kwargs):
         super(PythonOperator, self).__init__(*args, **kwargs)
         if not callable(python_callable):
             raise SebFlowException('`python_callable` must be callable')
@@ -20,5 +25,3 @@ class PythonOperator(BaseOperator):
 
     def execute_callable(self):
         return self.python_callable(*self.op_args, **self.op_kwargs)
-
-    
