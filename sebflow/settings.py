@@ -1,15 +1,17 @@
 import logging
 import os
 
+import pendulum
+import sebflow.configuration as conf
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-import sebflow.configuration as conf
-import pendulum
 from logging_config import configure_logging
 
 log = logging.getLogger(__name__)
+
 TIMEZONE = pendulum.timezone('UTC')
+
 try:
     tz = conf.get('core', 'default_timezone')
     if tz == 'system':
@@ -19,8 +21,7 @@ try:
 except:
     pass
 
-print('configured default timezone %s' % TIMEZONE)
-
+CONFIG_DIR = os.path.join(os.path.dirname(__file__), 'config_files')
 
 HEADER = '''
    _____ __________  ________    ____ _       __
@@ -49,7 +50,6 @@ def configure_vars():
 
 
 def configure_orm(disable_connection_pool=False):
-    log.debug("Setting up DB connection pool (PID %s)" % os.getpid())
     global engine
     global Session
     engine_args = {}
@@ -76,7 +76,6 @@ def dispose_orm():
     if engine:
         engine.dispose()
         engine = None
-
 
 
 configure_vars()
