@@ -1,4 +1,4 @@
-docker run -it^
+docker run -d^
   -e POSTGRES_ROOT_PASSWORD=sebflow132435^
   -e POSTGRES_DB=sebflow^
   -e POSTGRES_USER=seb^
