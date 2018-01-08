@@ -1,10 +1,9 @@
 import errno
 import os
-import StringIO
-
-from six import iteritems
 
 from sebflow.exceptions import SebflowConfigException
+from six import iteritems
+
 from six.moves import configparser
 
 ConfigParser = configparser.SafeConfigParser
@@ -95,10 +94,9 @@ def mkdir_p(path):
             raise SebflowConfigException('Had trouble creating a directory')
 
 
-config_dir = os.path.join(os.path.dirname(__file__), 'config_files')
-print config_dir
+CONFIG_DIR = os.path.join(os.path.dirname(__file__), 'config_files')
 conf = SebflowConfigParser()
-conf.read(os.path.join(config_dir, 'sebflow.cfg'))
+conf.read(os.path.join(CONFIG_DIR, 'sebflow.cfg'))
 
 
 def get(section, key, **kwargs):

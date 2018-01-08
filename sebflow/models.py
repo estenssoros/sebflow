@@ -1,15 +1,18 @@
-from sqlalchemy import (Boolean, Column, DateTime, Float, ForeignKey, Index,
-                        Integer, LargeBinary, PickleType, String, Text, func)
+from sqlalchemy import (Boolean, Column,
+                        Integer, String, func)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_utc import UtcDateTime
 
 from sebflow import timezone
-from sebflow.utils.decorators import apply_defaults
+# from sebflow.utils.decorators import apply_defaults
 from sebflow.exceptions import SebflowException
 from sebflow.utils.log.logging_mixin import LoggingMixin
 from sebflow.state import State
 from sebflow.utils.db import get_or_create, provide_session
+from colorama import init
 from termcolor import colored
+
+init()
 
 Base = declarative_base()
 
@@ -167,7 +170,7 @@ class DAG(LoggingMixin):
 
         self.logger.info('DAG %s [starting]' % self._dag_id)
 
-        from executors import LocalExecutor
+        from sebflow.executors.local_executor import LocalExecutor
 
         dag_run = DagRun(dag_id=self._dag_id)
         session.add(dag_run)

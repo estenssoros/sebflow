@@ -1,7 +1,7 @@
-from sebflow.decorators import apply_defaults
 from sebflow.exceptions import SebflowException
 from sebflow.models import BaseOperator
 from sebflow.state import State
+# from sebflow.utils.decorators import apply_defaults
 
 
 class PythonOperator(BaseOperator):

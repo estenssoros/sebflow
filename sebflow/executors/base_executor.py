@@ -1,4 +1,4 @@
-from sebflow.log.logging_mixin import LoggingMixin
+from sebflow.utils.log.logging_mixin import LoggingMixin
 
 
 class BaseExecutor(LoggingMixin):
