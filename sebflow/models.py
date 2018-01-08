@@ -183,11 +183,6 @@ class DAG(LoggingMixin):
         executor.end()
 
         self.logger.info('DAG %s [complete]' % self._dag_id)
-
-        # if all(t.state == State.SUCCESS for t in self.tasks):
-        #     dag.last_run_result = State.SUCCESS
-        # else:
-        #     dag.last_run_result = State.FAILED
         session.commit()
 
 
@@ -197,6 +192,7 @@ class BaseOperator(LoggingMixin):
         self.task_id = task_id
         self.dag = dag
         self.state = State.PENDING
+        self.msg = None
 
         self._upstream_task_ids = []
         self._downstream_task_ids = []
@@ -255,7 +251,10 @@ class BaseOperator(LoggingMixin):
 
     def __repr__(self):
         state = colored(self.state, State.color(self.state))
-        return "<Task({0}): {1}> [{2}]".format(self.__class__.__name__, self.task_id, state)
+        if self.state==State.FAILED:
+            return "<Task({0}): {1}> [{2}] - {3}".format(self.__class__.__name__, self.task_id, state,self.msg)
+        else:
+            return "<Task({0}): {1}> [{2}]".format(self.__class__.__name__, self.task_id, state)
 
     def append_only_new(self, l, item):
         if any([item is t for t in l]):
