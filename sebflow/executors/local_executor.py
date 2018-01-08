@@ -5,11 +5,11 @@ import time
 from Queue import Empty as QueueEmpty
 
 from sebflow import timezone
-from sebflow.log.logging_mixin import LoggingMixin
+from sebflow.utils.log.logging_mixin import LoggingMixin
 from sebflow.models import DagModel, DagRun, Task
 from sebflow.state import State
-from sebflow.utils.db import get_or_create, provide_session
-from sebflow.executors.base_exector import BaseExecutor
+from sebflow.utils.db import provide_session
+from sebflow.executors.base_executor import BaseExecutor
 
 
 class LocalWorker(multiprocessing.Process, LoggingMixin):
@@ -73,9 +73,9 @@ def get_downstream_tasks(task):
 
 
 class Evaluator(multiprocessing.Process, LoggingMixin):
-    def __init__(self, executor, task_dict, task_queue, eval_queue, result_queue):
-        self.executor = executor
-        self.dag_run_id = self.executor.dag.dag_run_id
+    def __init__(self, dag_info, task_dict, task_queue, eval_queue, result_queue):
+        self.dag_id = dag_info['dag_id']
+        self.dag_run_id = dag_info['dag_run_id']
         self.task_dict = task_dict
 
         self.task_queue = task_queue
@@ -168,7 +168,7 @@ class Evaluator(multiprocessing.Process, LoggingMixin):
         dag_run.state = State.SUCCESS
         session.commit()
 
-        dag = session.query(DagModel).filter_by(dag_id=self.executor.dag.dag_id).first()
+        dag = session.query(DagModel).filter_by(dag_id=self.dag_id).first()
         if len(self.success) == len(self.task_dict):
             dag.last_run_result=State.SUCCESS
         else:
@@ -232,8 +232,8 @@ class LocalExecutor(BaseExecutor):
         self.impl.start()
 
         task_dict = self.get_task_dict()
-
-        self.evalulator = Evaluator(self, task_dict, self.queue, self.eval_queue, self.result_queue)
+        dag_info={'dag_id':self.dag.dag_id,'dag_run_id':self.dag.dag_run_id}
+        self.evalulator = Evaluator(dag_info, task_dict, self.queue, self.eval_queue, self.result_queue)
         self.evalulator.start()
 
         for task in self.dag.tasks:
