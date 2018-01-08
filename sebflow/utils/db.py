@@ -1,8 +1,8 @@
 import contextlib
+import os
 from functools import wraps
 
 import psycopg2
-
 import sebflow.configuration as conf
 from sebflow import settings
 
@@ -18,7 +18,7 @@ def connect_db():
 def initdb(asdf):
     curs, conn = connect_db()
 
-    with open(conf.get('core', 'create_tables_script'), 'r') as f:
+    with open(os.path.join(settings.CONFIG_DIR, conf.get('core', 'create_tables_script')), 'r') as f:
         sql = f.read()
 
     for query in sql.split(';'):
