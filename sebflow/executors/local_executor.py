@@ -5,28 +5,18 @@ import time
 from Queue import Empty as QueueEmpty
 
 from sebflow import timezone
-from sebflow.utils.log.logging_mixin import LoggingMixin
+from sebflow.executors.base_executor import BaseExecutor
 from sebflow.models import DagModel, DagRun, Task
 from sebflow.state import State
 from sebflow.utils.db import provide_session
-from sebflow.executors.base_executor import BaseExecutor
+from sebflow.utils.log.logging_mixin import LoggingMixin
 
 
 class LocalWorker(multiprocessing.Process, LoggingMixin):
-
-    """LocalWorker Process implementation to run airflow commands. Executes the given
-    command and puts the result into a result queue when done, terminating execution."""
-
     def __init__(self, result_queue):
-        """
-        :param result_queue: the queue to store result states tuples (key, State)
-        :type result_queue: multiprocessing.Queue
-        """
         super(LocalWorker, self).__init__()
-        self.daemon = True
+        self.daemon = False
         self.result_queue = result_queue
-        self.key = None
-        self.command = None
 
     def run(self):
         raise self.NotImplementedError()
@@ -59,12 +49,14 @@ class QueuedLocalWorker(LocalWorker):
                 task.execute()
                 task.state = State.SUCCESS
                 self.logger.info('task %s [successful]' % task.task_id)
+                msg = None
             except Exception as e:  # return error message somewhere, somehow
                 task.state = State.FAILED
+                msg = e
                 self.logger.error('task %s [failed]' % task.task_id)
 
             self.eval_queue.put(task)
-            self.result_queue.put((task.task_id, task.state))
+            self.result_queue.put((task.task_id, task.state, msg))
 
 
 def get_downstream_tasks(task):
@@ -149,7 +141,7 @@ class Evaluator(multiprocessing.Process, LoggingMixin):
                     for tid in task.downstream_task_ids:
                         self._upstream_failed.add(tid)
 
-                    self.result_queue.put((task.task_id, State.UPSTREAM_FAILED))
+                    self.result_queue.put((task.task_id, State.UPSTREAM_FAILED, None))
                     continue
 
                 if all(tid in self.success for tid in task.upstream_task_ids):
@@ -170,12 +162,10 @@ class Evaluator(multiprocessing.Process, LoggingMixin):
 
         dag = session.query(DagModel).filter_by(dag_id=self.dag_id).first()
         if len(self.success) == len(self.task_dict):
-            dag.last_run_result=State.SUCCESS
+            dag.last_run_result = State.SUCCESS
         else:
-            dag.last_run_result=State.FAILED
+            dag.last_run_result = State.FAILED
         session.commit()
-
-
 
 
 class LocalExecutor(BaseExecutor):
@@ -201,8 +191,9 @@ class LocalExecutor(BaseExecutor):
             occurs after end
             '''
             while not self.executor.result_queue.empty():
-                task_id, state = self.executor.result_queue.get()
+                task_id, state, msg = self.executor.result_queue.get()
                 self.executor.dag.get_task(task_id).state = state
+                self.executor.dag.get_task(task_id).msg = msg
 
         def end(self):
             '''
@@ -232,7 +223,7 @@ class LocalExecutor(BaseExecutor):
         self.impl.start()
 
         task_dict = self.get_task_dict()
-        dag_info={'dag_id':self.dag.dag_id,'dag_run_id':self.dag.dag_run_id}
+        dag_info = {'dag_id': self.dag.dag_id, 'dag_run_id': self.dag.dag_run_id}
         self.evalulator = Evaluator(dag_info, task_dict, self.queue, self.eval_queue, self.result_queue)
         self.evalulator.start()
 
