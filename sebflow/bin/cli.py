@@ -3,29 +3,29 @@
 
 import argparse
 from collections import namedtuple
+
 from .. import settings
 from ..utils import db as db_utils
 
+def initdb(args):  # noqa
+    print("DB: " + repr(settings.engine.url))
+    db_utils.initdb(args)
+    print("Done.")
+
+
 Arg = namedtuple('Arg', ['flags', 'help', 'action', 'default', 'nargs', 'type', 'choices', 'metavar'])
 Arg.__new__.__defaults__ = (None, None, None, None, None, None, None)
-
-
-def initdb(args):
-    print("Initializing DB...")
-    db_utils.init_db()
-    print("Done.")
 
 
 class CLIFactory(object):
     subparsers = (
         {
             'func': initdb,
-            'help': 'initalize the database',
-            'args': tuple()
+            'help': "Initialize the metadata database",
+            'args': tuple(),
         },
     )
     subparsers_dict = {sp['func'].__name__: sp for sp in subparsers}
-    dag_subparsers = ('list_tasks', 'backfill', 'test', 'run', 'pause', 'unpause')
 
     @classmethod
     def get_parser(cls, dag_parser=False):

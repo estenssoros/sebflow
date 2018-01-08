@@ -14,12 +14,13 @@ def do_setup():
         description='programatically author, schedule, and monitor data pipelines',
         license='MIT',
         packages=find_packages(),
-        include_package_date =True,
+        include_package_data =True,
         install_requires=[
             'psycopg2==2.7.3.2',
             'django==1.11',
             'tabulate==0.7.7',
-            'sqlalchemy-utc==0.9.0'
+            'sqlalchemy-utc==0.9.0',
+            'termcolor==1.1.0'
         ],
         author='Sebastian Estenssoro',
         author_email='seb.estenssoro@gmail.com',
