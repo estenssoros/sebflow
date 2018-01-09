@@ -20,7 +20,8 @@ def do_setup():
             'django==1.11',
             'tabulate==0.7.7',
             'sqlalchemy-utc==0.9.0',
-            'termcolor==1.1.0'
+            'termcolor==1.1.0',
+            'colorama==0.3.9'
         ],
         author='Sebastian Estenssoro',
         author_email='seb.estenssoro@gmail.com',
