@@ -315,7 +315,7 @@ class Task(Base):
     task_id = Column(String(50))
     dag_run_id = Column(Integer)
     state = Column(String(50), default=State.PENDING)
-    start_date = Column(UtcDateTime, default=func.now())
+    start_date = Column(UtcDateTime)
     end_date = Column(UtcDateTime)
     hostname = Column(String(50))
     unixname = Column(String(50))

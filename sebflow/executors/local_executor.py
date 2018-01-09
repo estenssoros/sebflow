@@ -104,6 +104,7 @@ class Evaluator(multiprocessing.Process, LoggingMixin):
             if task.state == State.QUEUED:
                 task_model = session.query(Task).filter_by(task_id=task.task_id, dag_run_id=self.dag_run_id).first()
                 task_model.state = State.QUEUED
+                task_model.start_date = timezone.utcnow()
                 session.commit()
                 self.task_queue.put(task)
                 continue
@@ -148,6 +149,8 @@ class Evaluator(multiprocessing.Process, LoggingMixin):
                     task.state = State.QUEUED
                     task_model = session.query(Task).filter_by(task_id=task.task_id, dag_run_id=self.dag_run_id).first()
                     task_model.state = State.QUEUED
+                    task_model.start_date = timezone.utcnow()
+                    session.commit()
                     session.commit()
                     self.task_queue.put(task)
                     continue
