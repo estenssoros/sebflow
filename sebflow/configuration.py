@@ -1,5 +1,6 @@
 import errno
 import os
+import shutil
 
 from sebflow.exceptions import SebflowConfigException
 from six import iteritems
@@ -94,9 +95,20 @@ def mkdir_p(path):
             raise SebflowConfigException('Had trouble creating a directory')
 
 
-CONFIG_DIR = os.path.join(os.path.dirname(__file__), 'config_files')
+if 'SEBFLOW_HOME' not in os.environ:
+    SEBFLOW_HOME = expand_env_var('~/sebflow')
+else:
+    SEBFLOW_HOME = expand_env_var(os.environ['SEBFLOW_HOME'])
+
+mkdir_p(SEBFLOW_HOME)
+
+DEFAULT_CONFIG = os.path.join(os.path.dirname(__file__), 'config_files', 'sebflow.cfg')
+
+if not os.path.exists(os.path.join(SEBFLOW_HOME, 'sebflow.cfg')):
+    shutil.copy(DEFAULT_CONFIG, SEBFLOW_HOME)
+
 conf = SebflowConfigParser()
-conf.read(os.path.join(CONFIG_DIR, 'sebflow.cfg'))
+conf.read(os.path.join(SEBFLOW_HOME, 'sebflow.cfg'))
 
 
 def get(section, key, **kwargs):
