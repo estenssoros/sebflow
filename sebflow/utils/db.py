@@ -8,9 +8,14 @@ from sebflow import settings
 
 
 def connect_db():
+    if 'postgresql' in settings.SQL_ALCHEMY_CONN:
+        import psycopg2 as connector
+    elif 'mssql' in settings.SQL_ALCHEMY_CONN:
+        import pymssql as connector
+
     creds = conf.getsection('db_creds')
     creds.pop('__name__')
-    conn = psycopg2.connect(**creds)
+    conn = connector.connect(**creds)
     curs = conn.cursor()
     return curs, conn
 
@@ -18,7 +23,12 @@ def connect_db():
 def initdb(asdf):
     curs, conn = connect_db()
 
-    with open(os.path.join(settings.CONFIG_DIR, conf.get('core', 'create_tables_script')), 'r') as f:
+    if 'postgresql' in settings.SQL_ALCHEMY_CONN:
+        create_table_file = 'create_tables_postgres.sql'
+    elif 'mssql' in settings.SQL_ALCHEMY_CONN:
+        create_table_file = 'create_tables_mssql.sql'
+
+    with open(os.path.join(settings.CONFIG_DIR, create_table_file), 'r') as f:
         sql = f.read()
 
     for query in sql.split(';'):

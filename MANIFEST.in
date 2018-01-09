@@ -1,2 +1,3 @@
-include sebflow/config_files/create_tables.sql
+include sebflow/config_files/create_tables_mssql.sql
+include sebflow/config_files/create_tables_postgres.sql
 include sebflow/config_files/sebflow.cfg
