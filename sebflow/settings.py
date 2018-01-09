@@ -45,8 +45,7 @@ def configure_vars():
     global SEBFLOW_HOME
     global SQL_ALCHEMY_CONN
     SEBFLOW_HOME = os.path.expanduser(conf.get('core', 'SEBFLOW_HOME'))
-    DB_CREDS = conf.getsection('db_creds')
-    SQL_ALCHEMY_CONN = conf.get('core', 'SQL_ALCHEMY_CONN').format(**DB_CREDS)
+    SQL_ALCHEMY_CONN = conf.get('core', 'SQL_ALCHEMY_CONN')
 
 
 def configure_orm(disable_connection_pool=False):
