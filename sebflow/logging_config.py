@@ -28,29 +28,7 @@ DEFAULT_LOGGING_CONFIG = {
             'formatter': 'sebflow',
             'stream': 'ext://sys.stdout'
         },
-        # 'processor': {
-        #     'class': 'logging.StreamHandler',
-        #     'formatter': 'sebflow',
-        #     'stream': 'ext://sys.stdout'
-        # },
-        # 'task': {
-        #     'class': 'logging.StreamHandler',
-        #     'formatter': 'sebflow',
-        #     'stream': 'ext://sys.stdout'
-        # },
     },
-    # 'loggers': {
-    #     'sebflow.processor': {
-    #         'handlers': ['processor'],
-    #         'level': LOG_LEVEL,
-    #         'propagate': False,
-    #     },
-    #     'sebflow.task': {
-    #         'handlers': ['task'],
-    #         'level': LOG_LEVEL,
-    #         'propagate': False,
-    #     },
-    # },
     'root': {
         'handlers': ['console'],
         'level': LOG_LEVEL,

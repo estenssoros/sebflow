@@ -7,6 +7,7 @@ from collections import namedtuple
 from .. import settings
 from ..utils import db as db_utils
 
+
 def initdb(args):  # noqa
     print("DB: " + repr(settings.engine.url))
     db_utils.initdb(args)
@@ -21,7 +22,7 @@ class CLIFactory(object):
     subparsers = (
         {
             'func': initdb,
-            'help': "Initialize the metadata database",
+            'help': "Initialize testing databases",
             'args': tuple(),
         },
     )
