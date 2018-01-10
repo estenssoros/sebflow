@@ -2,7 +2,6 @@ import contextlib
 import os
 from functools import wraps
 
-import psycopg2
 import sebflow.configuration as conf
 from sebflow import settings
 
