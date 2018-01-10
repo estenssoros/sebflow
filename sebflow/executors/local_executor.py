@@ -13,6 +13,10 @@ from sebflow.utils.log.logging_mixin import LoggingMixin
 
 
 class LocalWorker(multiprocessing.Process, LoggingMixin):
+    """
+    LocalWorker Process implementation. Executes the given command and puts the
+    result into a result queue when done, terminating execution.
+    """
     def __init__(self, result_queue):
         super(LocalWorker, self).__init__()
         self.daemon = False
@@ -23,6 +27,11 @@ class LocalWorker(multiprocessing.Process, LoggingMixin):
 
 
 class QueuedLocalWorker(LocalWorker):
+    """
+    LocalWorker implementation that is waiting for tasks from a queue and will
+    continue executing commands as they become available in the queue. It will terminate
+    execution once None is sent throught the quque.
+    """
     def __init__(self, task_queue, eval_queue, result_queue):
         super(QueuedLocalWorker, self).__init__(result_queue=result_queue)
         self.task_queue = task_queue
@@ -65,6 +74,10 @@ def get_downstream_tasks(task):
 
 
 class Evaluator(multiprocessing.Process, LoggingMixin):
+    """
+    Helper class to run QueuedLocalWorker. Takse the place of Scheduler for
+    evaulating and marking tasks as complete, queued, failed, etc.
+    """
     def __init__(self, dag_info, task_dict, task_queue, eval_queue, result_queue):
         self.dag_id = dag_info['dag_id']
         self.dag_run_id = dag_info['dag_run_id']
@@ -172,7 +185,17 @@ class Evaluator(multiprocessing.Process, LoggingMixin):
 
 
 class LocalExecutor(BaseExecutor):
+    """
+    LocalExecutor executes tasks locally in parallel. It uses the
+    multiprocessing Python library and queues to parallelize the execution
+    of tasks.
+    """
     class _LimitedParallelism(LoggingMixin):
+        """
+        Implements LocalExecutor with limited parallelism using a task queue to
+        coordinate work distribution.
+        """
+
         def __init__(self, executor):
             self.executor = executor
 

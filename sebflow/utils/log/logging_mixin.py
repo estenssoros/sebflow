@@ -9,6 +9,9 @@ import six
 from sebflow.logging_config import DEFAULT_LOGGING_CONFIG
 
 class LoggingMixin(object):
+    """
+    Convenience super-class to have a logger configured with the class name
+    """
     _logger_configured = False
 
     @property

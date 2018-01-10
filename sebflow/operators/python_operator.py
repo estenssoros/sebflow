@@ -5,6 +5,9 @@ from sebflow.state import State
 
 
 class PythonOperator(BaseOperator):
+    """
+    Executes a python callable
+    """
     # @apply_defaults
     def __init__(
         self,

@@ -2,6 +2,9 @@ from sebflow.utils.log.logging_mixin import LoggingMixin
 
 
 class BaseExecutor(LoggingMixin):
+    """
+    Class to derive in order to interface with executor-type systems
+    """
     def __init__(self, dag, parallelism=32):
         self.dag = dag
         self.parallelism = parallelism
