@@ -1,13 +1,16 @@
 import errno
+import logging
 import os
 import shutil
 
-from sebflow.exceptions import SebflowConfigException
 from six import iteritems
 
+from sebflow.exceptions import SebflowConfigException
 from six.moves import configparser
 
 ConfigParser = configparser.SafeConfigParser
+
+logger = logging.getLogger(__name__)
 
 
 def expand_env_var(env_var):
@@ -105,6 +108,7 @@ mkdir_p(SEBFLOW_HOME)
 DEFAULT_CONFIG = os.path.join(os.path.dirname(__file__), 'config_files', 'sebflow.cfg')
 
 if not os.path.exists(os.path.join(SEBFLOW_HOME, 'sebflow.cfg')):
+    logger.warning('Could not find sebflow.cfg file. Creating one at %s' % os.path.join(SEBFLOW_HOME, 'sebflow.cfg'))
     shutil.copy(DEFAULT_CONFIG, SEBFLOW_HOME)
 
 conf = SebflowConfigParser()
