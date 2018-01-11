@@ -5,14 +5,19 @@ from setuptools import find_packages, setup
 
 base_dir = os.path.dirname(__file__)
 
-for f in ('build', 'dist', 'sebflow.egg-info'):
-    if os.path.exists(f):
-        shutil.rmtree(f)
+
+def remove_build_files():
+    for f in ('build', 'dist', 'sqlwriter.egg-info'):
+        if os.path.exists(f):
+            shutil.rmtree(f)
+
 
 with open(os.path.join(base_dir, "README.rst")) as f:
     long_description = f.read()
 
+
 def do_setup():
+    remove_build_files()
     setup(
         name='sebflow',
         version='0.0.2',
@@ -20,7 +25,7 @@ def do_setup():
         description='programatically author and monitor data pipelines',
         long_description=long_description,
         packages=find_packages(),
-        include_package_data =True,
+        include_package_data=True,
         install_requires=[
             'psycopg2==2.7.3.2',
             'django==1.11',
