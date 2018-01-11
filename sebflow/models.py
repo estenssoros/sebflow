@@ -1,5 +1,6 @@
 import json
-from urllib.parse import urlparse
+from builtins import bytes
+from urlparse import urlparse
 
 from colorama import init
 from sebflow import configuration, timezone
@@ -27,7 +28,7 @@ def get_fernet():
     or because the Fernet key is invalid.
 
     :return: Fernet object
-    :raises: AirflowException if there's a problem trying to load Fernet
+    :raises: SebflowException if there's a problem trying to load Fernet
     """
     try:
         from cryptography.fernet import Fernet
@@ -344,12 +345,19 @@ class Task(Base):
 
 
 class Connection(Base, LoggingMixin):
+    """
+    Placeholder to store information about different database instances
+    connection information. The idea here is that scripts use references to
+    database instances (conn_id) instead of hard coding hostname, logins and
+    passwords when using operators or hooks.
+    """
     __tablename__ = "connection"
+
     id = Column(Integer(), primary_key=True)
     conn_id = Column(String(50))
     conn_type = Column(String(100))
     host = Column(String(100))
-    schema = Column(String(100))
+    schema = Column('_schema', String(100))
     login = Column(String(100))
     _password = Column('password', String(100))
     port = Column(Integer())
@@ -414,6 +422,7 @@ class Connection(Base, LoggingMixin):
         if value:
             try:
                 fernet = get_fernet()
+                print 'VALUE: {}'.format(value)
                 self._password = fernet.encrypt(bytes(value, 'utf-8')).decode()
                 self.is_encrypted = True
             except SebflowException:
@@ -524,3 +533,8 @@ class Connection(Base, LoggingMixin):
                 self.log.error("Failed parsing the json for conn_id %s", self.conn_id)
 
         return obj
+
+
+if __name__ == '__main__':
+
+    f = get_fernet()
