@@ -1,7 +1,9 @@
+from contextlib import closing
 from contextlib.hooks.dbapi_hook import DbApiHook
 
 import psycopg2
 import psycopg2.extensions
+
 
 class PostgresHook(DbApiHook):
     """

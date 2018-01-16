@@ -1,12 +1,13 @@
 import os
 import random
 
-from sebflow.execeptions import SebflowException
-from sebflow.log.logging_mixin import LoggingMixin
+from sebflow.exceptions import SebflowException
 from sebflow.models import Connection
 from sebflow.utils.db import provide_session
+from sebflow.utils.log.logging_mixin import LoggingMixin
 
 CONN_ENV_PREFIX = 'SEBFLOW_CONN_'
+
 
 class BaseHook(LoggingMixin):
     """
@@ -23,15 +24,10 @@ class BaseHook(LoggingMixin):
     @classmethod
     @provide_session
     def _get_connections_from_db(cls, conn_id, session=None):
-        db = (
-            session.query(Connection)
-            .filter(Connection.conn_id == conn_id)
-            .all()
-        )
+        db = (session.query(Connection).filter(Connection.conn_id == conn_id).all())
         session.expunge_all()
         if not db:
-            raise SebflowException(
-                "The conn_id `{0}` isn't defined".format(conn_id))
+            raise SebflowException("The conn_id `{0}` isn't defined".format(conn_id))
         return db
 
     @classmethod
