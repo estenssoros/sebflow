@@ -31,6 +31,7 @@ CREATE TABLE sebflow.dbo.task (
   , end_date DATETIME DEFAULT NULL
   , hostname NVARCHAR(50)
   , unixname NVARCHAR(50)
+  , message TEXT DEFAULT NULL
   , PRIMARY KEY (id)
   , UNIQUE (task_id, dag_run_id)
 );
