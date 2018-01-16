@@ -17,6 +17,7 @@ class LocalWorker(multiprocessing.Process, LoggingMixin):
     LocalWorker Process implementation. Executes the given command and puts the
     result into a result queue when done, terminating execution.
     """
+
     def __init__(self, result_queue):
         super(LocalWorker, self).__init__()
         self.daemon = False
@@ -32,6 +33,7 @@ class QueuedLocalWorker(LocalWorker):
     continue executing commands as they become available in the queue. It will terminate
     execution once None is sent throught the quque.
     """
+
     def __init__(self, task_queue, eval_queue, result_queue):
         super(QueuedLocalWorker, self).__init__(result_queue=result_queue)
         self.task_queue = task_queue
@@ -61,6 +63,7 @@ class QueuedLocalWorker(LocalWorker):
                 msg = None
             except Exception as e:  # return error message somewhere, somehow
                 task.state = State.FAILED
+                task.message = str(e)
                 msg = e
                 self.logger.error('task %s [failed]' % task.task_id)
 
@@ -68,16 +71,12 @@ class QueuedLocalWorker(LocalWorker):
             self.result_queue.put((task.task_id, task.state, msg))
 
 
-def get_downstream_tasks(task):
-    if not task.downstream_task_ids:
-        return []
-
-
 class Evaluator(multiprocessing.Process, LoggingMixin):
     """
     Helper class to run QueuedLocalWorker. Takse the place of Scheduler for
     evaulating and marking tasks as complete, queued, failed, etc.
     """
+
     def __init__(self, dag_info, task_dict, task_queue, eval_queue, result_queue):
         self.dag_id = dag_info['dag_id']
         self.dag_run_id = dag_info['dag_run_id']
@@ -134,6 +133,7 @@ class Evaluator(multiprocessing.Process, LoggingMixin):
                 task_model = session.query(Task).filter_by(task_id=task.task_id, dag_run_id=self.dag_run_id).first()
                 task_model.state = State.FAILED
                 task_model.end_date = timezone.utcnow()
+                task_model.message = task.message
                 session.commit()
                 self.failed.add(task.task_id)
                 for task_id in task.downstream_task_ids:
