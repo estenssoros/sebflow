@@ -30,5 +30,6 @@ CREATE TABLE task (
   , end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL
   , hostname VARCHAR(50)
   , unixname VARCHAR(50)
+  , message TEXT DEFAULT NULL
   , UNIQUE (task_id, dag_run_id)
 );
