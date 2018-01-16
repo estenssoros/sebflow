@@ -5,14 +5,17 @@ from contextlib import contextmanager
 from logging import Handler, StreamHandler
 
 import six
-
 from sebflow.logging_config import DEFAULT_LOGGING_CONFIG
+
 
 class LoggingMixin(object):
     """
     Convenience super-class to have a logger configured with the class name
     """
     _logger_configured = False
+
+    def __init__(self, context=None):
+        self._set_context(context)
 
     @property
     def logger(self):
@@ -21,6 +24,20 @@ class LoggingMixin(object):
             self._logger_configured = True
         name = '.'.join([self.__class__.__name__])
         return logging.getLogger(name)
+
+    @property
+    def log(self):
+        try:
+            return self._log
+        except AttributeError:
+            self._log = logging.root.getChild(
+                self.__class__.__module__ + '.' + self.__class__.__name__
+            )
+            return self._log
+
+    def _set_context(self, context):
+        if context is not None:
+            set_context(self.log, context)
 
 
 class StreamLogWriter(object):
