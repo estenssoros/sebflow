@@ -1,4 +1,4 @@
-from sebflow.hook.mssql_hook import MsSqlHook
+from sebflow.hooks.mssql_hook import MsSqlHook
 from sebflow.models import BaseOperator
 from sebflow.state import State
 
