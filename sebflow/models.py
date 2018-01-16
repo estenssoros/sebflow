@@ -342,6 +342,7 @@ class Task(Base):
     end_date = Column(UtcDateTime)
     hostname = Column(String(50))
     unixname = Column(String(50))
+    message = Column(String(500))
 
 
 class Connection(Base, LoggingMixin):
