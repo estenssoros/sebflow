@@ -1,8 +1,9 @@
 import time
 
 from sebflow import DAG
-from sebflow.operators.python_operator import PythonOperator
 from sebflow.exceptions import SebOnPurposeError
+from sebflow.operators.mssql_operator import MsSqlOperator
+from sebflow.operators.python_operator import PythonOperator
 
 
 def sleep1():
@@ -14,7 +15,7 @@ def sleep5(*args, **kwargs):
 
 
 def fail_on_purpose(arg1, arg2):
-    raise SebOnPurposeError()
+    raise SebOnPurposeError("Failed on purpose ya'll")
 
 
 def do_nothing(arg1, arg2, kwarg1=None, kwarg2=None):
@@ -82,6 +83,13 @@ t9 = PythonOperator(
     python_callable=sleep1,
 )
 
+tsql = MsSqlOperator(
+    task_id='test_mssql',
+    dag=dag,
+    sql='select * from sebflow.dbo.task',
+    mssql_conn_id='densql'
+)
+
 
 t2.set_upstream(t1)
 t3.set_upstream(t1)
@@ -91,6 +99,7 @@ t6.set_upstream(t4)
 t7.set_upstream(t3)
 t8.set_upstream(t7)
 t9.set_upstream([t1, t3, t5])
+tsql.set_upstream(t1)
 
 if __name__ == '__main__':
     dag.tree_view()
