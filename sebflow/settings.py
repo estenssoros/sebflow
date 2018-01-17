@@ -33,7 +33,7 @@ HEADER = '''
 '''
 
 LOGGING_LEVEL = logging.INFO
-
+SLACK_CHANNEL='denver_notifications'
 SEBFLOW_HOME = None
 SQL_ALCHEMY_CONN = None
 
