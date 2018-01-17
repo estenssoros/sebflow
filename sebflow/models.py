@@ -3,7 +3,7 @@ from builtins import bytes
 from urlparse import urlparse
 
 from colorama import init
-from sebflow import configuration, timezone
+from sebflow import configuration, settings, timezone
 # from sebflow.utils.decorators import apply_defaults
 from sebflow.exceptions import SebflowException
 from sebflow.state import State
@@ -170,6 +170,20 @@ class DAG(LoggingMixin):
             get_upstream(t)
         print '-' * 50
 
+    @property
+    def string_tree_view(self):
+
+        def get_downstream(lst, task, level=0):
+            lst.append((" " * level * 4) + '<Task({t.__class__.__name__}): {t.task_id}> [{t.state}] - {t.msg}'.format(t=task))
+            level += 1
+            for t in task.downstream_list:
+                get_downstream(lst, t, level)
+        msg = []
+        for t in self.roots:
+            get_downstream(msg, t)
+
+        return '\n'.join(msg)
+
     def add_task(self, task):
         if task.task_id in self.task_dict:
             raise SebflowException('task {} already exists in dag'.format(str(task)))
@@ -207,6 +221,21 @@ class DAG(LoggingMixin):
 
         self.logger.info('DAG %s [complete]' % self._dag_id)
         session.commit()
+        self.report()
+
+    @provide_session
+    def report(self, method='if_failed', session=None):
+        try:
+            from seb import slack_notification
+        except ImportError:
+            print 'Could not import seb module.'
+            return
+        if any([task.state == State.FAILED for task in self.tasks]):
+            # dag_run = session.query(DagRun).filter_by(dag_run_id=self.dag_run_id).first()
+            self.logger.info('REPORTING')
+            msg = '*DAG [{0}]* `Failed`'.format(self._dag_id)
+            msg += '\n```\n{}\n```'.format(self.string_tree_view)
+            slack_notification(settings.SLACK_CHANNEL, msg)
 
 
 class BaseOperator(LoggingMixin):
