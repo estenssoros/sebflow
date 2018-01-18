@@ -1,9 +1,11 @@
 import time
 
+import sebflow.configuration as conf
 from sebflow import DAG
 from sebflow.exceptions import SebOnPurposeError
 from sebflow.operators.mssql_operator import MsSqlOperator
 from sebflow.operators.python_operator import PythonOperator
+from sebflow.operators.slack_operator import SlackAPIPostOperator
 
 
 def sleep1():
@@ -90,6 +92,12 @@ tsql = MsSqlOperator(
     mssql_conn_id='densql'
 )
 
+t10 = SlackAPIPostOperator(
+    task_id='test_slack',
+    dag=dag,
+    channel='denver_notifications',
+    token=conf.get('core', 'slack_token')
+)
 
 t2.set_upstream(t1)
 t3.set_upstream(t1)
@@ -100,6 +108,7 @@ t7.set_upstream(t3)
 t8.set_upstream(t7)
 t9.set_upstream([t1, t3, t5])
 tsql.set_upstream(t1)
+t10.set_upstream(tsql)
 
 if __name__ == '__main__':
     dag.tree_view()
