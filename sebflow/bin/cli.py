@@ -6,6 +6,7 @@ import reprlib
 from collections import namedtuple
 from urlparse import urlunparse
 
+import tabulate
 from sqlalchemy.orm import exc
 
 from .. import settings
