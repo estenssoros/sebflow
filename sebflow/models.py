@@ -356,7 +356,7 @@ class DagRun(Base):
     __tablename__ = 'dag_run'
     dag_run_id = Column(Integer, primary_key=True)
     dag_id = Column(String(50))
-    start_date = Column(UtcDateTime, default=func.now())
+    start_date = Column(UtcDateTime, default=timezone.utcnow())
     end_date = Column(UtcDateTime)
     state = Column(String(50), default=State.RUNNING)
 
