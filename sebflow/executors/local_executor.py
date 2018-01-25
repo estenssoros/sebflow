@@ -167,6 +167,10 @@ class Evaluator(multiprocessing.Process, LoggingMixin):
                     session.commit()
                     self.task_queue.put(task)
                     continue
+                    
+            if task.state == State.UPSTREAM_FAILED:
+                self.result_queue.put((task.task_id, State.UPSTREAM_FAILED, None))
+                continue
 
             # FINALLY
             self.eval_queue.put(task)
