@@ -174,7 +174,7 @@ class DAG(LoggingMixin):
     def string_tree_view(self):
 
         def get_downstream(lst, task, level=0):
-            lst.append((" " * level * 4) + '<Task({t.__class__.__name__}): {t.task_id}> [{t.state}] - {t.msg}'.format(t=task))
+            lst.append('<Task({t.__class__.__name__}): {t.task_id}> [{t.state}] - {t.msg}'.format(t=task))
             level += 1
             for t in task.downstream_list:
                 get_downstream(lst, t, level)
