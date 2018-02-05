@@ -6,12 +6,25 @@ import reprlib
 from collections import namedtuple
 from urlparse import urlunparse
 
-import tabulate
 from sqlalchemy.orm import exc
 
+import tabulate
+
+from .. import configuration as conf
 from .. import settings
 from ..models import Connection
 from ..utils import db as db_utils
+from ..www.app import cached_app
+
+
+def webserver(args):
+    print(settings.HEADER)
+    access_logfile = args.access_logfile or conf.get('webserver', 'access_logfile')
+    error_logfile = args.error_logfile or conf.get('webserver', 'error_logfile')
+    num_workers = args.workers or conf.get('webserver', 'workers')
+    worker_timeout = args.worker_timeout or conf.get('webserver', 'web_server_worker_timeout')
+    ssl_cert = args.ssl_cert or conf.get('webserver', 'web_server_ssl_cert')
+    ssl_key = args.ssl_key or conf.get('webserver', 'web_server_ssl_key')
 
 
 def initdb(args):  # noqa
@@ -165,6 +178,66 @@ class CLIFactory(object):
         'conn_schema': Arg(('--conn_schema',), help='Connection schema, optional when adding a connection', type=str),
         'conn_port': Arg(('--conn_port',), help='Connection port, optional when adding a connection', type=str),
         'conn_extra': Arg(('--conn_extra',), help='Connection `Extra` field, optional when adding a connection', type=str),
+        # WEBSERVER
+        'port': Arg(
+            ('-p', '--port'),
+            default=conf.get('webserver', 'WEB_SERVER_PORT'),
+            type=int,
+            help='The Port on which to run the server'),
+        'workers': Arg(
+            ("-w", "--workers"),
+            default=conf.get('webserver', 'WORKERS'),
+            type=int,
+            help="Number of workers to run the webserver on"),
+        'workerclass': Arg(
+            ("-k", "--workerclass"),
+            default=conf.get('webserver', 'WORKER_CLASS'),
+            choices=['sync', 'eventlet', 'gevent', 'tornado'],
+            help="The worker class to use for Gunicorn"),
+        'worker_timeout': Arg(
+            ("-t", "--worker_timeout"),
+            default=conf.get('webserver', 'WEB_SERVER_WORKER_TIMEOUT'),
+            type=int,
+            help="The timeout for waiting on webserver workers"),
+        'hostname': Arg(
+            ("-hn", "--hostname"),
+            default=conf.get('webserver', 'WEB_SERVER_HOST'),
+            help="Set the hostname on which to run the web server"),
+        'pid': Arg(
+            ("--pid",),
+            "PID file location",
+            nargs='?'),
+        'daemon': Arg(
+            ("-D", "--daemon"),
+            "Daemonize instead of running in the foreground",
+            "store_true"),
+        'stdout': Arg(
+            ("--stdout",), "Redirect stdout to this file"),
+        'stderr': Arg(
+            ("--stderr",), "Redirect stderr to this file"),
+        'access_logfile': Arg(
+            ("-A", "--access_logfile"),
+            default=conf.get('webserver', 'ACCESS_LOGFILE'),
+            help="The logfile to store the webserver access log. Use '-' to print to stderr."),
+        'error_logfile': Arg(
+            ("-E", "--error_logfile"),
+            default=conf.get('webserver', 'ERROR_LOGFILE'),
+            help="The logfile to store the webserver error log. Use '-' to print to stderr."),
+        'log_file': Arg(
+            ("-l", "--log-file"),
+            "Location of the log file"),
+        'ssl_cert': Arg(
+            ("--ssl_cert",),
+            default=conf.get('webserver', 'WEB_SERVER_SSL_CERT'),
+            help="Path to the SSL certificate for the webserver"),
+        'ssl_key': Arg(
+            ("--ssl_key",),
+            default=conf.get('webserver', 'WEB_SERVER_SSL_KEY'),
+            help="Path to the key to use with the SSL certificate"),
+        'debug': Arg(
+            ("-d", "--debug"),
+            "Use the server that ships with Flask in debug mode",
+            "store_true"),
     }
     subparsers = (
         {
@@ -177,6 +250,13 @@ class CLIFactory(object):
             'help': "List/Add/Delete connections",
             'args': ('list_connections', 'add_connection', 'delete_connection',
                      'conn_id', 'conn_uri', 'conn_extra') + tuple(alternative_conn_specs),
+        },
+        {
+            'func': webserver,
+            'help': 'Start a Sebflow webserver isntance',
+            'args': ('port', 'workers', 'workerclass', 'worker_timeout', 'hostname',
+                     'pid', 'daemon', 'stdout', 'stderr', 'access_logfile',
+                     'error_logfile', 'log_file', 'ssl_cert', 'ssl_key', 'debug'),
         }
     )
     subparsers_dict = {sp['func'].__name__: sp for sp in subparsers}
