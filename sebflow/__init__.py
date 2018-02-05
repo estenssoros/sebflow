@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from importlib import import_module
 
-from airflow import configuration as conf
+from sebflow import configuration as conf
 from sebflow.exceptions import SebflowException
 from sebflow.utils.log.logging_mixin import LoggingMixin
-
+from sebflow.models import DAG
 
 def load_login():
     log = LoggingMixin().log
