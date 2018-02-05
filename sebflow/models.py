@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 import json
+
 from builtins import bytes
 from urlparse import urlparse
 
@@ -9,7 +11,7 @@ from sebflow.exceptions import SebflowException
 from sebflow.state import State
 from sebflow.utils.db import get_or_create, provide_session
 from sebflow.utils.log.logging_mixin import LoggingMixin
-from sqlalchemy import Boolean, Column, Integer, String, func
+from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import synonym
 from sqlalchemy_utc import UtcDateTime
@@ -563,8 +565,3 @@ class Connection(Base, LoggingMixin):
                 self.log.error("Failed parsing the json for conn_id %s", self.conn_id)
 
         return obj
-
-
-if __name__ == '__main__':
-
-    f = get_fernet()
