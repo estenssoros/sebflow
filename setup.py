@@ -32,7 +32,16 @@ def do_setup():
             'tabulate==0.7.7',
             'sqlalchemy-utc==0.9.0',
             'termcolor==1.1.0',
-            'colorama==0.3.9'
+            'colorama==0.3.9',
+            'flask==0.11',
+            'flask-wtf==0.14',
+            'flask-cache==0.13.1',
+            'markdown==2.5.2',
+            'flask-admin==1.4.1',
+            'jinja2==2.7.3',
+            'bleach==2.1.2',
+            'python-nvd3==0.14.2',
+            'python-slugify==1.1.4'
         ],
         author='Sebastian Estenssoro',
         author_email='seb.estenssoro@gmail.com',
