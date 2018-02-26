@@ -167,7 +167,7 @@ class Evaluator(multiprocessing.Process, LoggingMixin):
                     session.commit()
                     self.task_queue.put(task)
                     continue
-                    
+
             if task.state == State.UPSTREAM_FAILED:
                 self.result_queue.put((task.task_id, State.UPSTREAM_FAILED, None))
                 continue
@@ -177,7 +177,10 @@ class Evaluator(multiprocessing.Process, LoggingMixin):
 
         dag_run = session.query(DagRun).filter_by(dag_run_id=self.dag_run_id).first()
         dag_run.end_date = timezone.utcnow()
-        dag_run.state = State.SUCCESS
+        if self.failed:
+            dag_run.state=State.FAILED
+        else:
+            dag_run.state = State.SUCCESS
         session.commit()
 
         dag = session.query(DagModel).filter_by(dag_id=self.dag_id).first()
