@@ -38,7 +38,7 @@ def do_setup():
             'flask-cache==0.13.1',
             'markdown==2.5.2',
             'flask-admin==1.4.1',
-            'jinja2==2.7.3',
+            'jinja2>=2.7.3, <2.9.0',
             'bleach==2.1.2',
             'python-nvd3==0.14.2',
             'python-slugify==1.1.4'
