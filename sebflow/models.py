@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import json
-
 from builtins import bytes
 from urlparse import urlparse
 
@@ -242,7 +241,7 @@ class DAG(LoggingMixin):
 
 class BaseOperator(LoggingMixin):
     # @apply_defaults
-    def __init__(self, task_id, dag=None):
+    def __init__(self, task_id, description=None, dag=None):
         self.task_id = task_id
         self.dag = dag
         self.state = State.PENDING
