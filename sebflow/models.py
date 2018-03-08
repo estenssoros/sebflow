@@ -274,8 +274,6 @@ class BaseOperator(LoggingMixin):
             raise SebflowException('The DAG assigned to {} cannot be changed.'.format(self))
         elif self.task_id not in dag.task_dict:
             dag.add_task(self)
-        elif self.task_id in dag.task_dict:
-            raise  SebflowException('The DAG alread contains a task_id [%s]' %  self.task_id)
         self._dag = dag
 
     def has_dag(self):
