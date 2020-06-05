@@ -28,7 +28,7 @@ def do_setup():
         include_package_data=True,
         install_requires=[
             'psycopg2==2.7.3.2',
-            'django==1.11',
+            'django==1.11.29',
             'tabulate==0.7.7',
             'sqlalchemy-utc==0.9.0',
             'termcolor==1.1.0',
